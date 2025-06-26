@@ -1,21 +1,22 @@
-name: Run Telegram Bot  # Название workflow
+name: Run Telegram Bot 24/7
 on:
-  schedule:
-    - cron: '*/30 * * * *'  # Запускать каждые 30 минут
-  workflow_dispatch:  # Позволяет запускать вручную
+  workflow_dispatch:
+  repository_dispatch:
 
 jobs:
   run-bot:
-    runs-on: ubuntu-latest  # Используем Ubuntu
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4  # Клонируем репозиторий
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'  # Версия Python
+          python-version: '3.11'
       - name: Install dependencies
-        run: pip install -r requirements.txt  # Устанавливаем зависимости
+        run: pip install -r requirements.txt
       - name: Run bot
         run: |
-          nohup python bot.py > bot.log 2>&1 &  # Запускаем бота в фоне
-          sleep 60  # Ждём 60 секунд
+          while true; do
+            python bot.py || echo "Bot crashed, restarting..."
+            sleep 10
+          done
